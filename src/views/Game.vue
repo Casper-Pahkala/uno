@@ -330,19 +330,19 @@ watch((myCards), (newVal, oldVal) => {
 
 
 .card.blue {
-  background-color: blue;
+  background-color: #284FDA;
 }
 
 .card.red {
-  background-color: red;
+  background-color: #C30B00;
 }
 
 .card.yellow {
-  background-color: yellow;
+  background-color: #E7D101;
 }
 
 .card.green {
-  background-color: green;
+  background-color: #43A047;
 }
 
 .card.wild {

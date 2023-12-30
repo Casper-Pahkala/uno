@@ -1,5 +1,5 @@
 <template>
-  <div class="main" v-if="store.lobby">
+  <div class="lobby" v-if="store.lobby">
     <v-card
       class="code-container"
       elevation="10"
@@ -65,7 +65,7 @@
 </script>
 
 <style scoped>
-  .main {
+  .lobby {
     height: 100%;
     display: flex;
     /* justify-content: center; */
