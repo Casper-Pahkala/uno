@@ -18,8 +18,20 @@
         </template>
 
         <template v-else-if="latestGameCard.value === 'Wild Draw Four'">
-            <img class="wild" :src="`/wild_4_${latestGameCard.color}.png`">
-          </template>
+          <img class="wild" :src="`/wild_4_${latestGameCard.color}.png`">
+        </template>
+
+        <template v-else-if="latestGameCard.value === 'Skip'">
+          <img class="skip" :src="`/skip_${latestGameCard.color}.jpg`">
+        </template>
+
+        <template v-else-if="latestGameCard.value === 'Reverse'">
+          <img class="wild" :src="`/reverse_${latestGameCard.color}.jpg`">
+        </template>
+        
+        <template v-else-if="latestGameCard.value === 'Draw Two'">
+          <img class="wild" :src="`/drawtwo_${latestGameCard.color}.jpg`">
+        </template>
 
         <template v-else>
           {{ latestGameCard.value }}
@@ -33,7 +45,7 @@
 
 
     <div class="my-cards">
-      <div class="my-cards-wrapper">
+      <div class="my-cards-wrapper" ref="myCardsRef">
         <div
             v-for="(card, index) in myCards"
             :key="index"
@@ -46,6 +58,18 @@
 
           <template v-else-if="card.value === 'Wild Draw Four'">
             <img class="wild" src="/wild_4.png">
+          </template>
+
+          <template v-else-if="card.value === 'Skip'">
+            <img class="wild" :src="`/skip_${card.color}.jpg`">
+          </template>
+
+          <template v-else-if="card.value === 'Reverse'">
+            <img class="wild" :src="`/reverse_${card.color}.jpg`">
+          </template>
+
+          <template v-else-if="card.value === 'Draw Two'">
+            <img class="wild" :src="`/drawtwo_${card.color}.jpg`">
           </template>
 
           <template v-else>
@@ -75,21 +99,17 @@
 
 
   <v-dialog v-model="colorDialog" persistent width="400px">
-    <v-card>
-      <v-btn @click="selectColor('blue')">
-        Blue
+    <v-card class="colors">
+      <v-btn class="color blue" @click="selectColor('blue')">
       </v-btn>
 
-      <v-btn @click="selectColor('red')">
-        Red
+      <v-btn class="color red" @click="selectColor('red')">
       </v-btn>
 
-      <v-btn @click="selectColor('yellow')">
-        Yellow
+      <v-btn class="color yellow" @click="selectColor('yellow')">
       </v-btn>
 
-      <v-btn @click="selectColor('green')">
-        Green
+      <v-btn class="color green" @click="selectColor('green')">
       </v-btn>
     </v-card>
 
@@ -114,7 +134,7 @@
 
 <script setup lang="ts">
 import { useAppStore } from '@/store/app';
-import { computed, ref } from 'vue';
+import { computed, ref, watch, Ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 
 const store = useAppStore();
@@ -138,7 +158,7 @@ if (!store.lobby) {
 
 const colorDialog = ref(false);
 const toPlayWildCard = ref(null);
-
+const myCardsRef: Ref<HTMLElement | null> = ref(null);
 const latestGameCard = computed(() => {
   if (!store.lobby) {
     return null;
@@ -164,7 +184,6 @@ const myCards = computed(() => {
     return null;
   }
   const player = store.lobby.game.players.find((p: any) => p.id === store.player.id);
-  console.log(store.lobby.game.players, store.player.id);
   if (!player) {
     return [];
   }
@@ -239,6 +258,23 @@ function gameWinner() {
   return store.lobby.game.players.find((p: any) => p.id === id).name;
 }
 
+watch((myCards), (newVal, oldVal) => {
+  if (newVal && oldVal) {
+    if (newVal.length > oldVal.length) {
+      
+        setTimeout(() => {
+          if (myCardsRef.value) {
+            const maxScrollLeft = myCardsRef.value.scrollWidth - myCardsRef.value.clientWidth;
+            myCardsRef.value.scrollTo({
+              left: maxScrollLeft,
+              behavior: 'smooth'
+            });
+          }
+        }, 100);
+    }
+  }
+}, { deep: true })
+
 </script>
 
 <style scoped>
@@ -262,11 +298,13 @@ function gameWinner() {
   align-items: center;
   padding: 20px;
 
+
 }
 
 .my-cards-wrapper {
   display: flex;
-  max-width: 1200px;
+  width: 1200px;
+  max-width: 100vw;
   height: 100%;
   overflow-x: scroll;
   padding: 10px;
@@ -281,7 +319,7 @@ function gameWinner() {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 40px;
+  font-size: 70px;
   font-weight: 600;
   color: white;
   text-shadow: 0 0 2px black, 0 0 2px black, 0 0 2px black, 0 0 2px black;
@@ -361,5 +399,46 @@ function gameWinner() {
   width: 100%;
   height: 100%;
   object-fit: fill;
+}
+
+.colors {
+  display: flex;
+  gap: 10px;
+  flex-direction: row !important;
+  height: 100px;
+  padding: 10px;
+}
+
+.color {
+  flex: 1;
+  height: 100%;
+}
+
+.color.blue {
+  background-color: #284FDA;
+}
+
+.color.yellow {
+  background-color: #E7D101;  
+}
+
+.color.red {
+  background-color: #C30B00;
+}
+
+.color.green {
+  background-color: #43A047;
+}
+
+@media (max-width: 1199px) {
+  .players {
+    right: 10px;
+  }
+}
+
+@media (max-width: 699px) {
+  .players {
+    display: none;
+  }
 }
 </style>
